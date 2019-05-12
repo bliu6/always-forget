@@ -1,0 +1,22 @@
+see https://zhuanlan.zhihu.com/p/33059558
+
+新建一个你希望下载、安装 glibc 的目录，并 cd 到那里去。然后执行下列命令：
+wget http://mirror.rit.edu/gnu/libc/glibc-2.17.tar.gz
+tar zxvf glibc-2.17.tar.gz
+mkdir glibc-2.17-build glibc-2.17-install
+cd glibc-2.17-build
+../glibc-2.17/configure --prefix=`readlink -f ../glibc-2.17-install`
+make -j 8
+make -j 8 install
+这段命令会下载 glibc 2.17 的源码，并解压到 glibc-2.17 目录中。然后，它会在 glibc-2.17-build 目录中编译 glibc，
+并安装到 glibc-2.17-install 目录中。glibc 要求编译不能直接在源码目录中进行，所以我才新建了 glibc-2.17-build 目录；
+文章开头说过 glibc 容易与系统的其它组件不兼容，所以我专门创建了 glibc-2.17-install 这个安装目录
+
+glibc 的编译安装可能花费半个小时至一个小时，请耐心等待。安装完毕之后，你会在 glibc-2.17-install 目录下看到 bin、lib 等目录。
+把 lib 目录定义成一个环境变量 GLIBC_DIR，备用：
+
+export GLIBC_DIR=<...>/glibc-2.17-install/lib
+这行代码最好也加到~/.bashrc里去，这样就永远可以使用GLIBC_DIR这个环境变量了。
+
+try:
+$GLIBC_DIR/ld-2.17.so --library-path $GLIBC_DIR:/lib64:$LD_LIBRARY_PATH `which python`
